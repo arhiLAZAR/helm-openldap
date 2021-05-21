@@ -116,7 +116,7 @@ replication:
   tls_reqcert: "never"
 ## Persist data to a persistent volume
 persistence:
-  enabled: false
+  enabled: true
   ## database data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -124,7 +124,7 @@ persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  # storageClass: "standard-singlewriter"
+  storageClass: "local-path"
   accessModes:
     - ReadWriteOnce
   size: 8Gi
