@@ -94,7 +94,6 @@ env:
   LDAP_TLS_VERIFY_CLIENT: "never"
   LDAP_TLS_PROTOCOL_MIN: "3.0"
   LDAP_TLS_CIPHER_SUITE: "NORMAL"
-  LDAP_REPLICATION: "true"
 
 # Default Passwords to use, stored as a secret.
 # You can override these at install time with
@@ -141,7 +140,6 @@ resources: {}
 nodeSelector: {}
 
 tolerations: []
-
 
 ## test container details
 test:
