@@ -66,9 +66,14 @@ service:
   ##
   externalIPs: []
 
-  #loadBalancerIP:
-  #loadBalancerSourceRanges: []
-  type: ClusterIP
+  # type: ClusterIP
+  type: LoadBalancer
+  master:
+    loadBalancerIP: '185.10.184.83'
+    # loadBalancerSourceRanges: []
+  slave:
+    loadBalancerIP: '185.10.184.84'
+    # loadBalancerSourceRanges: []
 
 # Default configuration for openldap as environment variables. These get injected directly in the container.
 # Use the env variables from https://github.com/osixia/docker-openldap#beginner-guide
