@@ -1,9 +1,9 @@
 apiVersion: {{ template "statefulset.apiVersion" . }}
 kind: StatefulSet
 metadata:
-  name:  {{ template "openldap.fullname" . }}
+  name:  {{ template "openldap.fullname" . }}-slave
   labels:
-    app: {{ template "openldap.fullname" . }}
+    app: {{ template "openldap.fullname" . }}-slave
     chart: {{ template "openldap.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -11,20 +11,20 @@ metadata:
 {{ toYaml .Values.extraLabels | indent 4 }}
 {{- end }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.slaveReplicaCount }}
 {{- if .Values.updateStrategy }}
   updateStrategy:
 {{ toYaml .Values.updateStrategy | indent 4 }}
 {{- end }}
   selector:
     matchLabels:
-      app: {{ template "openldap.fullname" . }}
+      app: {{ template "openldap.fullname" . }}-slave
       release: {{ .Release.Name }}
-  serviceName: {{ template "openldap.fullname" . }}-headless
+  serviceName: {{ template "openldap.fullname" . }}-headless-slave
   template:
     metadata:
       annotations:
-        checksum/configmap-env: {{ include (print $.Template.BasePath "/configmap-env.yaml") . | sha256sum }}
+        checksum/configmap-env: {{ include (print $.Template.BasePath "/configmap-env-slave.yaml") . | sha256sum }}
 {{- if .Values.customLdifFiles}}
         checksum/configmap-customldif: {{ include (print $.Template.BasePath "/configmap-customldif.yaml") . | sha256sum }}
 {{- end }}
@@ -32,11 +32,11 @@ spec:
 {{ toYaml .Values.podAnnotations | indent 8}}
 {{- end }}
       labels:
-        app: {{ template "openldap.fullname" . }}
+        app: {{ template "openldap.fullname" . }}-slave
         release: {{ .Release.Name }}
     spec:
       initContainers:
-      {{- if .Values.customTLS.enabled }}
+      {{- if .Values.tls.enabled }}
         - name: init-chmod-secret
           image: alpine
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -70,7 +70,7 @@ spec:
               containerPort: 636
           envFrom:
             - configMapRef:
-                name: {{ template "openldap.fullname" . }}-env
+                name: {{ template "openldap.fullname" . }}-env-slave
             - secretRef:
                 name: {{ template "openldap.secretName" . }}
           volumeMounts:
@@ -80,7 +80,7 @@ spec:
             - name: data
               mountPath: /etc/ldap/slapd.d
               subPath: config-data
-{{- if .Values.customTLS.enabled }}
+{{- if .Values.tls.enabled }}
             - name: certs
               mountPath: "/container/service/slapd/assets/certs"
 {{- else }}
@@ -99,12 +99,12 @@ spec:
                   fieldPath: metadata.name
             #- name: HOSTNAME
             #  value: $(POD_NAME).{{ template "openldap.fullname" . }}-headless
-          {{- if .Values.customTLS.enabled }}
+          {{- if .Values.tls.enabled }}
             - name: LDAP_TLS_CRT_FILENAME
               value: tls.crt
             - name: LDAP_TLS_KEY_FILENAME
               value: tls.key
-          {{- if .Values.customTLS.CA.enabled }}
+          {{- if .Values.tls.CA.enabled }}
             - name: LDAP_TLS_CA_CRT_FILENAME
               value: ca.crt
           {{- end }}
@@ -127,7 +127,7 @@ spec:
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
-      affinity: 
+      affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - topologyKey: kubernetes.io/hostname
@@ -140,7 +140,7 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
     {{- if .Values.image.pullSecret }}
-      imagePullSecrets: 
+      imagePullSecrets:
         - name: {{ .Values.image.pullSecret }}
     {{- end }}
       volumes:
@@ -149,15 +149,15 @@ spec:
           configMap:
             name: {{ template "openldap.fullname" . }}-customldif
 {{- end }}
-{{- if .Values.customTLS.enabled }}
+{{- if .Values.tls.enabled }}
         - name: secret-certs
           secret:
-            secretName: {{.Values.customTLS.secret}}
+            secretName: {{.Values.tls.secret}}
         - name: certs
           emptyDir:
             medium: Memory
 {{- end }}
-{{- if .Values.persistence.enabled }} 
+{{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: data

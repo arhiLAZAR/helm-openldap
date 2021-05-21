@@ -5,10 +5,10 @@ metadata:
   annotations:
 {{ toYaml .Values.service.annotations | indent 4 }}
 {{- end }}
-  name: {{ template "openldap.fullname" . }}
+  name: {{ template "openldap.fullname" . }}-master
   namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "openldap.fullname" . }}
+    app: {{ template "openldap.fullname" . }}-master
     chart: {{ template "openldap.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -43,5 +43,5 @@ spec:
       nodePort: null
       {{- end }}
   selector:
-    app: {{ template "openldap.fullname" . }}
+    app: {{ template "openldap.fullname" . }}-master
     release: {{ .Release.Name }}

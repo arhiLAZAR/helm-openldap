@@ -48,18 +48,32 @@ Generate chart secret name
 {{ default (include "openldap.fullname" .) .Values.existingSecret }}
 {{- end -}}
 {{/*
-Generate replication services list
+Generate replication master-services list
 */}}
-{{- define "replicalist" -}}
+{{- define "replicalist-master" -}}
 {{- $name := (include "openldap.fullname" .) }}
 {{- $namespace := .Release.Namespace }}
 {{- $cluster := .Values.replication.clusterName }}
-{{- $nodeCount := .Values.replicaCount | int }}
+{{- $nodeCount := .Values.masterReplicaCount | int }}
   {{- range $index0 := until $nodeCount -}}
     {{- $index1 := $index0 | add1 -}}
-'ldap://{{ $name }}-{{ $index0 }}.{{ $name }}-headless.{{ $namespace }}.svc.{{ $cluster }}'{{ if ne $index1 $nodeCount }},{{ end }}
+'ldap://{{ $name }}-master-{{ $index0 }}.{{ $name }}-headless-master.{{ $namespace }}.svc.{{ $cluster }}'{{ if ne $index1 $nodeCount }},{{ end -}}
   {{- end -}}
 {{- end -}}
+
+Generate replication slave-services list
+*/}}
+{{- define "replicalist-slave" -}}
+{{- $name := (include "openldap.fullname" .) }}
+{{- $namespace := .Release.Namespace }}
+{{- $cluster := .Values.replication.clusterName }}
+{{- $nodeCount := .Values.slaveReplicaCount | int }}
+  {{- range $index0 := until $nodeCount -}}
+    {{- $index1 := $index0 | add1 -}}
+'ldap://{{ $name }}-slave-{{ $index0 }}.{{ $name }}-headless-slave.{{ $namespace }}.svc.{{ $cluster }}'{{ if ne $index1 $nodeCount }},{{ end -}}
+  {{- end -}}
+{{- end -}}
+
 {{/*
 Renders a value that contains template.
 Usage:
