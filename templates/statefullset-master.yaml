@@ -152,7 +152,7 @@ spec:
 {{- if .Values.tls.enabled }}
         - name: secret-certs
           secret:
-            secretName: {{.Values.tls.secret}}
+            secretName: {{ .Values.tls.secretMaster }}
         - name: certs
           emptyDir:
             medium: Memory
