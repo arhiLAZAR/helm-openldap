@@ -43,7 +43,7 @@ logLevel: info
 # Spcifies an existing secret to be used for admin and config user passwords
 existingSecret: ""
 # settings for enabling TLS with custom certificate
-customTLS:
+tls:
   enabled: false
   secret: ""  # The name of a kubernetes.io/tls type secret to use for TLS
   CA:
