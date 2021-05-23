@@ -142,8 +142,7 @@ persistence:
   storageClass: "local-path"
   accessModes:
     - ReadWriteOnce
-  dataSize: 8Gi
-  logsSize: 8Gi
+  size: 8Gi
 
 fluentd:
   enabled: true
