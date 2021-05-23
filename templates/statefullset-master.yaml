@@ -147,6 +147,27 @@ spec:
             - name: fluentd-config
               mountPath: /fluentd/etc
       {{- end }}
+        - name: logrotate
+          image: "{{ .Values.images.logrotate.repository }}:{{ .Values.images.logrotate.tag }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          volumeMounts:
+            - name: logs
+              mountPath: {{ .Values.log.directory }}
+          env:
+            - name: "LOGROTATE_INTERVAL"
+              value: "{{ .Values.logrotate.check_interval }}"
+            - name: "LOGS_DIRECTORIES"
+              value: "{{ .Values.log.directory }}"
+            - name: "LOG_FILE_ENDINGS"
+              value: "log ldif"
+            - name: "LOGROTATE_COPIES"
+              value: "{{ .Values.logrotate.old_copies }}"
+            - name: "LOGROTATE_SIZE"
+              value: "{{ .Values.logrotate.max_log_size }}"
+          {{- if .Values.logrotate.compress }}
+            - name: "LOGROTATE_COMPRESSION"
+              value: "compress"
+          {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
