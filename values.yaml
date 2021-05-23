@@ -112,13 +112,14 @@ logrotate:
 # Default Passwords to use, stored as a secret.
 # You can override these at install time with
 # helm install openldap --set openldap.adminPassword=<passwd>,openldap.configPassword=<passwd>
-adminPassword: Not@SecurePassw0rd
-configPassword: Not@SecurePassw0rd
+adminPassword: Not@SecureP@ssw0rd
+configPassword: Not@SecureP@ssw0rd
 
 # Custom openldap configuration files used to override default settings
 # customLdifFiles:
   # 01-default-users.ldif: |-
     # Predefine users here
+
 replication:
   enabled: true
   # Enter the name of your cluster, defaults to "cluster.local"
