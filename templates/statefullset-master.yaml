@@ -45,9 +45,6 @@ spec:
             - |
               chown -R 911:911 /var/log/openldap
             {{- if .Values.tls.enabled }}
-            - sh
-            - -c
-            - |
               mkdir /certs/test
               cp -Lr /tmp-certs/* /certs/test
               cp -Lr /tmp-certs/* /certs
@@ -60,7 +57,7 @@ spec:
               mountPath: "/tmp-certs"
             {{- end }}
             - name: logs
-              mountPath: /var/log/openldap
+              mountPath: "/var/log/openldap"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -133,6 +130,9 @@ spec:
             failureThreshold: 10
           resources:
 {{ toYaml .Values.resources | indent 12 }}
+      {{- if .Values.extraContainers }}
+        {{ toYaml .Values.extraContainers | nindent 8 }}
+      {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
