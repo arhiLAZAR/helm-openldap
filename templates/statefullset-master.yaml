@@ -186,19 +186,15 @@ spec:
             - name: "LOGROTATE_COMPRESSION"
               value: "compress"
           {{- end }}
-    {{- with .Values.nodeSelector }}
+    {{- with .Values.nodeSelector.master }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
+    {{- if .Values.affinity.master }}
       affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - topologyKey: kubernetes.io/hostname
-            labelSelector:
-              matchLabels:
-                app.kubernetes.io/component: {{ .Release.Name }}
-                app.kubernetes.io/instance: {{ .Release.Name }}
-    {{- with .Values.tolerations }}
+        {{ tpl .Values.affinity.master . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.tolerations.master }}
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}

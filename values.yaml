@@ -160,9 +160,31 @@ resources: {}
  #   cpu: "500m"
  #   memory: "512Mi"
 
-nodeSelector: {}
+nodeSelector:
+  master: {}
+  slave: {}
 
-tolerations: []
+affinity:
+  master: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - topologyKey: kubernetes.io/hostname
+        labelSelector:
+          matchLabels:
+            app: {{ template "openldap.fullname" . }}-master
+            release: {{ .Release.Name }}
+  slave: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - topologyKey: kubernetes.io/hostname
+        labelSelector:
+          matchLabels:
+            app: {{ template "openldap.fullname" . }}-slave
+            release: {{ .Release.Name }}
+
+tolerations:
+  master: []
+  slave: []
 
 probes:
   ldapmodifyCheck:
