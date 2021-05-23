@@ -101,7 +101,7 @@ data:
       </format>
       {{- if .Values.fluentd.splunk.flush_interval }}
       <buffer>
-        flush_interval {{ .Values.fluentd.flush_interval }}
+        flush_interval {{ .Values.fluentd.splunk.flush_intervall }}
       </buffer>
       {{- end }}
     </match>
