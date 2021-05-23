@@ -142,14 +142,14 @@ persistence:
 
 fluentd:
   enabled: false
-  refresh_interval: "1s"
+  refresh_interval: "10s"
   splunk:
     host: 127.0.0.1
     port: 8088
     token: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     force_http: false
     insecure_ssl: false
-    flush_interval: "5s"
+    flush_interval: "10s"
 
 resources: {}
  # requests:
