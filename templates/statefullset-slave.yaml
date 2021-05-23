@@ -36,7 +36,6 @@ spec:
         release: {{ .Release.Name }}
     spec:
       initContainers:
-      {{- if .Values.tls.enabled }}
         - name: init-chmod-secret
           image: alpine
           imagePullPolicy: {{ .Values.images.pullPolicy }}
@@ -44,15 +43,28 @@ spec:
             - sh
             - -c
             - |
+              touch {{ .Values.log.directory }}/{{ .Values.log.auditlog }}
+              chown 911:911 {{ .Values.log.directory }}/{{ .Values.log.auditlog }}
+            {{- if .Values.fluentd.enabled }}
+              for file in {{ .Values.log.stdout }}_parsed.pos {{ .Values.log.stdout }}_raw.pos {{ .Values.log.auditlog }}.pos; do
+                touch {{ .Values.log.directory }}/${file}
+                chown 100:65533 {{ .Values.log.directory }}/${file}
+              done
+            {{- end }}
+            {{- if .Values.tls.enabled }}
               mkdir /certs/test
               cp -Lr /tmp-certs/* /certs/test
               cp -Lr /tmp-certs/* /certs
+            {{- end }}
           volumeMounts:
+            {{- if .Values.tls.enabled }}
             - name: certs
               mountPath: "/certs"
             - name: secret-certs
               mountPath: "/tmp-certs"
-      {{- end }}
+            {{- end }}
+            - name: logs
+              mountPath: "{{ .Values.log.directory }}"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.images.openldap.repository }}:{{ .Values.images.openldap.tag }}"
@@ -80,6 +92,8 @@ spec:
             - name: data
               mountPath: /etc/ldap/slapd.d
               subPath: config-data
+            - name: logs
+              mountPath: {{ .Values.log.directory }}
 {{- if .Values.tls.enabled }}
             - name: certs
               mountPath: "/container/service/slapd/assets/certs"

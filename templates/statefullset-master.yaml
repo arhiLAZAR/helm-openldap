@@ -43,7 +43,14 @@ spec:
             - sh
             - -c
             - |
-              chown -R 911:911 /var/log/openldap
+              touch {{ .Values.log.directory }}/{{ .Values.log.auditlog }}
+              chown 911:911 {{ .Values.log.directory }}/{{ .Values.log.auditlog }}
+            {{- if .Values.fluentd.enabled }}
+              for file in {{ .Values.log.stdout }}_parsed.pos {{ .Values.log.stdout }}_raw.pos {{ .Values.log.auditlog }}.pos; do
+                touch {{ .Values.log.directory }}/${file}
+                chown 100:65533 {{ .Values.log.directory }}/${file}
+              done
+            {{- end }}
             {{- if .Values.tls.enabled }}
               mkdir /certs/test
               cp -Lr /tmp-certs/* /certs/test
@@ -57,7 +64,7 @@ spec:
               mountPath: "/tmp-certs"
             {{- end }}
             - name: logs
-              mountPath: "/var/log/openldap"
+              mountPath: "{{ .Values.log.directory }}"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.images.openldap.repository }}:{{ .Values.images.openldap.tag }}"
@@ -86,7 +93,7 @@ spec:
               mountPath: /etc/ldap/slapd.d
               subPath: config-data
             - name: logs
-              mountPath: /var/log/openldap
+              mountPath: {{ .Values.log.directory }}
 {{- if .Values.tls.enabled }}
             - name: certs
               mountPath: "/container/service/slapd/assets/certs"

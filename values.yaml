@@ -92,6 +92,22 @@ env:
   LDAP_TLS_VERIFY_CLIENT: "never"
   LDAP_TLS_PROTOCOL_MIN: "3.0"
   LDAP_TLS_CIPHER_SUITE: "NORMAL"
+  LOG_DIR: "/var/log/openldap"
+  LOG_FILE: "stdout.log"
+
+# Set the container log level
+# Valid log levels: none, error, warning, info (default), debug, trace
+logLevel: info
+log:
+  directory: "/var/log/openldap"
+  stdout: "stdout.log"
+  auditlog: "auditlog.ldif"
+
+logrotate:
+  check_interval: "daily" # Could be "hourly", "daily", "weekly", "monthly" or "yearly"
+  max_log_size: "10M"
+  old_copies: 14
+  compress: true
 
 # Default Passwords to use, stored as a secret.
 # You can override these at install time with
