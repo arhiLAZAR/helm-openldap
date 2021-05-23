@@ -124,7 +124,9 @@ replication:
   retry: 60
   timeout: 1
   interval: 00:00:00:10
-  enableCrossServerTLS: false
+  crossServerTLS:
+    enabled: true
+    useLdapsInsteadOfTLS: true
   starttls: "critical"
   tls_reqcert: "never"
 ## Persist data to a persistent volume

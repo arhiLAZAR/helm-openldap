@@ -54,10 +54,11 @@ Generate replication master-services list
 {{- $name := (include "openldap.fullname" .) }}
 {{- $namespace := .Release.Namespace }}
 {{- $cluster := .Values.replication.clusterName }}
+{{- $useLdaps := and .Values.replication.crossServerTLS.enabled .Values.replication.crossServerTLS.useLdapsInsteadOfTLS }}
 {{- $nodeCount := .Values.masterReplicaCount | int }}
   {{- range $index0 := until $nodeCount -}}
     {{- $index1 := $index0 | add1 -}}
-'ldap://{{ $name }}-master-{{ $index0 }}.{{ $name }}-headless-master.{{ $namespace }}.svc.{{ $cluster }}'{{ if ne $index1 $nodeCount }},{{ end -}}
+'ldap{{ if $useLdaps }}s{{ end }}://{{ $name }}-master-{{ $index0 }}.{{ $name }}-headless-master.{{ $namespace }}.svc.{{ $cluster }}'{{ if ne $index1 $nodeCount }},{{ end -}}
   {{- end -}}
 {{- end -}}
 
@@ -67,10 +68,11 @@ Generate replication slave-services list
 {{- $name := (include "openldap.fullname" .) }}
 {{- $namespace := .Release.Namespace }}
 {{- $cluster := .Values.replication.clusterName }}
+{{- $useLdaps := and .Values.replication.crossServerTLS.enabled .Values.replication.crossServerTLS.useLdapsInsteadOfTLS }}
 {{- $nodeCount := .Values.slaveReplicaCount | int }}
   {{- range $index0 := until $nodeCount -}}
     {{- $index1 := $index0 | add1 -}}
-'ldap://{{ $name }}-slave-{{ $index0 }}.{{ $name }}-headless-slave.{{ $namespace }}.svc.{{ $cluster }}'{{ if ne $index1 $nodeCount }},{{ end -}}
+'ldap{{ if $useLdaps }}s{{ end }}://{{ $name }}-slave-{{ $index0 }}.{{ $name }}-headless-slave.{{ $namespace }}.svc.{{ $cluster }}'{{ if ne $index1 $nodeCount }},{{ end -}}
   {{- end -}}
 {{- end -}}
 
