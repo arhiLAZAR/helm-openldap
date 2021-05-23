@@ -58,10 +58,10 @@ service:
   # type: ClusterIP
   type: LoadBalancer
   master:
-    loadBalancerIP: '185.10.184.83'
+    loadBalancerIP: '127.0.0.101'
     # loadBalancerSourceRanges: []
   slave:
-    loadBalancerIP: '185.10.184.84'
+    loadBalancerIP: '127.0.0.102'
     # loadBalancerSourceRanges: []
 
 # Default configuration for openldap as environment variables. These get injected directly in the container.
