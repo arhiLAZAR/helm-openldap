@@ -137,8 +137,15 @@ spec:
             failureThreshold: 10
           resources:
 {{ toYaml .Values.resources | indent 12 }}
-      {{- if .Values.extraContainers }}
-        {{ toYaml .Values.extraContainers | nindent 8 }}
+      {{- if .Values.fluentd.enabled }}
+        - name: fluentd
+          image: "{{ .Values.images.fluentd.repository }}:{{ .Values.images.fluentd.tag }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          volumeMounts:
+            - name: logs
+              mountPath: {{ .Values.log.directory }}
+            - name: fluentd-config
+              mountPath: /fluentd/etc
       {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -161,6 +168,16 @@ spec:
         - name: {{ .Values.images.pullSecret }}
     {{- end }}
       volumes:
+        - name: logs
+          emptyDir: {}
+      {{- if .Values.fluentd.enabled }}
+        - name: fluentd-config
+          configMap:
+            name: {{ template "openldap.fullname" . }}-fluentd-config
+            items:
+              - key: "fluent.conf"
+                path: "fluent.conf"
+      {{- end }}
 {{- if .Values.customLdifFiles }}
         - name: custom-ldif-files
           configMap:
