@@ -38,7 +38,7 @@ spec:
       initContainers:
         - name: init-chmod-secret
           image: alpine
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
           command:
             - sh
             - -c
@@ -60,8 +60,8 @@ spec:
               mountPath: "/var/log/openldap"
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.images.openldap.repository }}:{{ .Values.images.openldap.tag }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
           args:
             - -l
             - {{ .Values.logLevel }}
@@ -149,9 +149,9 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- if .Values.image.pullSecret }}
+    {{- if .Values.images.pullSecret }}
       imagePullSecrets:
-        - name: {{ .Values.image.pullSecret }}
+        - name: {{ .Values.images.pullSecret }}
     {{- end }}
       volumes:
 {{- if .Values.customLdifFiles }}

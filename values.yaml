@@ -25,15 +25,18 @@ updateStrategy: {}
   # type: RollingUpdate
   # rollingUpdate:
   #   partition: 1
-image:
-  repository: gitlab-registry.selectel.org/sre/docker/infra-openldap
-  tag: latest
-  # pullPolicy: Always
+images:
   # pullSecret: harbor
-
-# Set the container log level
-# Valid log levels: none, error, warning, info (default), debug, trace
-logLevel: info
+  pullPolicy: Always
+  openldap:
+    repository: gitlab-registry.selectel.org/sre/docker/infra-openldap
+    tag: latest
+  fluentd:
+    repository: gitlab-registry.selectel.org/sre/docker/infra-fluentd-splunk
+    tag: latest
+  logrotate:
+    repository: blacklabelops/logrotate
+    tag: "1.3"
 
 # Spcifies an existing secret to be used for admin and config user passwords
 existingSecret: ""
