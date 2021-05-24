@@ -29,10 +29,10 @@ images:
   # pullSecret: harbor
   pullPolicy: Always
   openldap:
-    repository: gitlab-registry.selectel.org/sre/docker/infra-openldap
+    repository: arhilazar/openldap
     tag: latest
   fluentd:
-    repository: gitlab-registry.selectel.org/sre/docker/infra-fluentd-splunk
+    repository: arhilazar/fluentd-splunk
     tag: latest
   logrotate:
     repository: blacklabelops/logrotate
