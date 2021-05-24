@@ -196,7 +196,7 @@ tolerations:
 probes:
   ldapmodifyCheck:
     enabled: false
-    baseDomain: "dc=selectel,dc=org"
+    baseDomain: "dc=example,dc=org"
   liveness:
     initialDelaySeconds: 20
     periodSeconds: 10
