@@ -40,7 +40,7 @@ spec:
             sleep 20
             restore_backup "${BACKUP_TMP_DIR}/initial-ldifs/slave.ldif" config slave
             sleep 10
-            {{- end -}}
+            {{- end }}
             restore_backup "${BACKUP_TMP_DIR}/tree.ldif"
         env:
         - name: LDAP_MASTER_HOST
