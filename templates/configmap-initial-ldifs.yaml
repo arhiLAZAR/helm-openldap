@@ -1,0 +1,49 @@
+#
+# A ConfigMap spec for openldap slapd that map directly to env variables in the Pod.
+# List of environment variables supported is from the docker image:
+# https://github.com/osixia/docker-openldap#beginner-guide
+# Note that passwords are defined as secrets
+#
+{{- if and (.Values.backup.enabled) (.Values.backup.initialLdifs.enabled) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "openldap.fullname" . }}-initial-ldifs
+  labels:
+    app: {{ template "openldap.name" . }}-master
+    chart: {{ template "openldap.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}
+data:
+  master.ldif: |
+    dn: cn=module{0},cn=config
+    changetype: modify
+    add: olcModuleLoad
+    olcModuleLoad: {4}back_monitor
+    olcModuleLoad: {5}accesslog
+    olcModuleLoad: {6}back_relay
+    olcModuleLoad: {7}auditlog
+    -
+
+    dn: olcOverlay={3}auditlog,olcDatabase={1}mdb,cn=config
+    changetype: add
+    olcOverlay: {3}auditlog
+    objectClass: olcAuditlogConfig
+    objectClass: olcOverlayConfig
+    olcAuditlogFile: /var/log/openldap/auditlog.ldif
+
+    dn: olcDatabase={1}mdb,cn=config
+    changetype: modify
+    add: olcSecurity
+    olcSecurity: tls=1
+    -
+  slave.ldif: |
+    dn: olcDatabase={1}mdb,cn=config
+    changetype: modify
+    add: olcSecurity
+    olcSecurity: tls=1
+    -
+{{- end }}
