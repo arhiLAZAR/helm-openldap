@@ -37,6 +37,9 @@ images:
   logrotate:
     repository: blacklabelops/logrotate
     tag: "1.3"
+  backup:
+    repository: arhilazar/openldap-backup
+    tag: latest
 
 # Spcifies an existing secret to be used for admin and config user passwords
 existingSecret: ""
