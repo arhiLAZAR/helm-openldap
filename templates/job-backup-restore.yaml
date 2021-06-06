@@ -1,0 +1,74 @@
+{{- if and (.Values.backup.enabled) (eq .Values.backup.mode "restore") -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "openldap.fullname" . }}-backup-restore
+  labels:
+    app: {{ template "openldap.fullname" . }}-master
+    chart: {{ template "openldap.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    "helm.sh/hook": "post-install"
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      name: {{ template "openldap.fullname" . }}-backup-restore
+      labels:
+        app: {{ template "openldap.fullname" . }}-backup-restore
+        release: {{ .Release.Name }}
+    spec:
+      restartPolicy: Never
+      {{- if .Values.images.pullSecret }}
+      imagePullSecrets:
+{{ toYaml .Values.images.pullSecret | indent 8 }}
+      {{- end }}
+      containers:
+      - name: restore-backup
+        image: "{{ .Values.images.backup.repository }}:{{ .Values.images.backup.tag }}"
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        command:
+          - sh
+          - -c
+          - |
+            rm -rf "${BACKUP_TMP_DIR}" 2>/dev/null
+            mkdir -p "${BACKUP_TMP_DIR}"
+            download_backup
+            {{- if .Values.backup.initialLdifs.enabled }}
+            restore_backup "${BACKUP_TMP_DIR}/initial-ldifs/master.ldif" config
+            sleep 20
+            restore_backup "${BACKUP_TMP_DIR}/initial-ldifs/slave.ldif" config slave
+            sleep 10
+            {{- end -}}
+            restore_backup "${BACKUP_TMP_DIR}/tree.ldif"
+        env:
+        - name: LDAP_MASTER_HOST
+          value: {{ .Values.backup.masterHost | quote }}
+        - name: LDAP_SLAVE_HOST
+          value: {{ .Values.backup.slaveHost | quote }}
+        - name: LDAP_STARTTLS
+          value: {{ .Values.backup.startTLS | quote }}
+        - name: LDAP_ADMIN_USER
+          value: {{ .Values.backup.adminUser | quote }}
+        - name: BACKUP_TMP_DIR
+          value: {{ .Values.backup.tmpDirectory }}
+        - name: RCLONE_S3_PROVIDER
+          value: {{ .Values.backup.s3.provider }}
+        - name: RCLONE_S3_ENDPOINT
+          value: {{ .Values.backup.s3.endpoint }}
+        - name: RCLONE_S3_REGION
+          value: {{ .Values.backup.s3.region }}
+        envFrom:
+          - secretRef:
+              name: {{ template "openldap.fullname" . }}}
+    {{- if .Values.backup.initialLdifs.enabled }}
+        volumeMounts:
+        - mountPath: {{ .Values.backup.tmpDirectory }}/initial-ldifs
+          name: initial-ldifs
+      volumes:
+      - name: initial-ldifs
+        configMap:
+          name: {{ template "openldap.fullname" . }}-initial-ldifs
+    {{- end -}}
+{{- end -}}
