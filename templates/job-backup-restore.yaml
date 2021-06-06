@@ -61,7 +61,7 @@ spec:
           value: {{ .Values.backup.s3.region }}
         envFrom:
           - secretRef:
-              name: {{ template "openldap.fullname" . }}}
+              name: {{ template "openldap.fullname" . }}
     {{- if .Values.backup.initialLdifs.enabled }}
         volumeMounts:
         - mountPath: {{ .Values.backup.tmpDirectory }}/initial-ldifs
