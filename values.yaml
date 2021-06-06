@@ -211,6 +211,29 @@ probes:
     failureThreshold: 2
     timeoutSeconds: 10
 
+backup:
+  enabled: false
+  mode: "create" # Valid modes: create, restore
+  createBackupSchedule: "* * * * *"
+  tmpDirectory: "/backups"
+  adminUser: cn=admin,dc=example,dc=org
+  masterHost: "ldaps://master.ldap.example.ru:636"
+  slaveHost: "ldaps://slave.ldap.example.ru:636"
+  startTLS: "false"
+  subtrees:
+    - ou=Users,dc=example,dc=org
+    - ou=Departments,dc=example,dc=org
+    - cn={9}example,cn=schema,cn=config
+    - olcDatabase={1}mdb,cn=config___olcAccess -s base
+  s3:
+    provider: "other"
+    endpoint: "https://s3.selcdn.ru"
+    region: "ru-1"
+    login: "my_login"
+    password: "AlsoNot@SecureP@ssw0rd"
+  initialLdifs:
+    enabled: true
+
 # settings for enabling TLS with custom certificate
 tls:
   enabled: false
