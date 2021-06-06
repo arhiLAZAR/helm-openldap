@@ -2,8 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-masterReplicaCount: 3
-slaveReplicaCount: 3
+masterReplicaCount: 2
+slaveReplicaCount: 1
 
 updateStrategy: {}
   # When a StatefulSet's .spec.updateStrategy.type is set to OnDelete,
