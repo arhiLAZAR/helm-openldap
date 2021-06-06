@@ -1,0 +1,59 @@
+{{- if and (.Values.backup.enabled) (eq .Values.backup.mode "create") -}}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ template "openldap.fullname" . }}-backup-create
+  labels:
+    app: {{ template "openldap.fullname" . }}-master
+    chart: {{ template "openldap.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  schedule: {{ .Values.backup.createBackupSchedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          name: {{ template "openldap.fullname" . }}-backup-create
+          labels:
+            app: {{ template "openldap.fullname" . }}-backup-create
+            release: {{ .Release.Name }}
+        spec:
+          restartPolicy: Never
+          {{- if .Values.images.pullSecret }}
+          imagePullSecrets:
+    {{ toYaml .Values.images.pullSecret | indent 8 }}
+          {{- end }}
+          containers:
+          - name: create-backup
+            image: "{{ .Values.images.backup.repository }}:{{ .Values.images.backup.tag }}"
+            imagePullPolicy: {{ .Values.images.pullPolicy }}
+            command:
+              - sh
+              - -c
+              - |
+                rm -rf "${BACKUP_TMP_DIR}" 2>/dev/null
+                mkdir -p "${BACKUP_TMP_DIR}"
+                {{- range .Values.backup.subtrees }}
+                save_subtree {{ . | quote }}
+                {{- end }}
+                upload_backup
+            env:
+            - name: LDAP_MASTER_HOST
+              value: {{ .Values.backup.masterHost | quote }}
+            - name: LDAP_STARTTLS
+              value: {{ .Values.backup.startTLS | quote }}
+            - name: LDAP_ADMIN_USER
+              value: {{ .Values.backup.adminUser | quote }}
+            - name: BACKUP_TMP_DIR
+              value: {{ .Values.backup.tmpDirectory }}
+            - name: RCLONE_S3_PROVIDER
+              value: {{ .Values.backup.s3.provider }}
+            - name: RCLONE_S3_ENDPOINT
+              value: {{ .Values.backup.s3.endpoint }}
+            - name: RCLONE_S3_REGION
+              value: {{ .Values.backup.s3.region }}
+            envFrom:
+              - secretRef:
+                  name: {{ template "openldap.fullname" . }}}
+{{- end -}}
