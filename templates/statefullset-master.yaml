@@ -179,7 +179,7 @@ spec:
               value: "{{ .Values.monitoring.password }}"
             - name: "INTERVAL"
               value: "{{ .Values.monitoring.interval }}"
-            - name: "LDAP_ADDR"
+            - name: "PROM_ADDR"
               value: ":{{ .Values.monitoring.port }}"
       {{- end }}
         - name: logrotate
