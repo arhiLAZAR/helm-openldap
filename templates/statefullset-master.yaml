@@ -165,6 +165,23 @@ spec:
             - name: fluentd-config
               mountPath: /fluentd/etc
       {{- end }}
+      {{- if .Values.monitoring.enabled }}
+        - name: monitoring
+          image: "{{ .Values.images.monitoring.repository }}:{{ .Values.images.monitoring.tag }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.monitoring.port }}
+          env:
+            - name: "LDAP_USER"
+              value: "{{ .Values.monitoring.login }}"
+            - name: "LDAP_PASS"
+              value: "{{ .Values.monitoring.password }}"
+            - name: "INTERVAL"
+              value: "{{ .Values.monitoring.interval }}"
+            - name: "LDAP_ADDR"
+              value: ":{{ .Values.monitoring.port }}"
+      {{- end }}
         - name: logrotate
           image: "{{ .Values.images.logrotate.repository }}:{{ .Values.images.logrotate.tag }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}

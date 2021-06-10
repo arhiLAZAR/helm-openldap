@@ -40,6 +40,10 @@ images:
   backup:
     repository: arhilazar/openldap-backup
     tag: latest
+  monitoring:
+    repository: arhilazar/openldap-exporter
+    tag: latest
+
 
 # Spcifies an existing secret to be used for admin and config user passwords
 existingSecret: ""
@@ -270,3 +274,10 @@ tls:
             -----BEGIN RSA PRIVATE KEY-----
             <key>
             -----END RSA PRIVATE KEY-----
+
+monitoring:
+  enabled: false
+  login: "cn=exporter,cn=monitor"
+  password: "MonitorsNot@SecureP@ssw0rd"
+  interval: "10s"
+  port: 9330
