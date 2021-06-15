@@ -50,6 +50,7 @@ spec:
       protocol: TCP
       port: {{ .Values.monitoring.port }}
       targetPort: metrics
+      nodePort: null
     {{- end }}
   selector:
     app: {{ template "openldap.fullname" . }}-slave
