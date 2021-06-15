@@ -12,6 +12,11 @@ spec:
   - port: {{ .Values.service.ldapPort }}
     name: ldap-port
     targetPort: ldap-port
+  {{- if .Values.monitoring.enabled }}
+  - port: {{ .Values.monitoring.port }}
+    name: metrics
+    targetPort: metrics
+  {{- end }}
   clusterIP: None
   selector:
     app: {{ template "openldap.fullname" . }}-slave

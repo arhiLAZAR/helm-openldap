@@ -45,13 +45,6 @@ spec:
       {{- else if eq .Values.service.type "ClusterIP" }}
       nodePort: null
       {{- end }}
-    {{- if .Values.monitoring.enabled }}
-    - name: metrics
-      protocol: TCP
-      port: {{ .Values.monitoring.port }}
-      targetPort: metrics
-      nodePort: null
-    {{- end }}
   selector:
     app: {{ template "openldap.fullname" . }}-slave
     release: {{ .Release.Name }}
